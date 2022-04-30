@@ -60,7 +60,8 @@ router.get('/getPdf', async (req, res) => {
         const pdf = pdfmake.createPdf(listTableDocs);
 
         // Writing it to disk
-        pdf.write('document' + Date.now() + ".pdf").then(() => {
+        const dir = path.join(__dirname , "../public/export/")
+        pdf.write(dir + 'data'+ Date.now() + ".pdf").then(() => {
             // success event
             res.send("Success");
         }, err => {
@@ -131,7 +132,8 @@ router.get('/userGetPdf/:id', async (req, res) => {
         const pdf = pdfmake.createPdf(listTableDocs);
 
         // Writing it to disk
-        pdf.write('document' + Date.now() + ".pdf").then(() => {
+        const dir = path.join(__dirname , "../public/export/")
+        pdf.write(dir + 'data'+ Date.now() + ".pdf").then(() => {
             // success event
             res.send("Success");
         }, err => {

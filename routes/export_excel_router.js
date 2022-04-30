@@ -4,6 +4,7 @@ const router = express.Router();
 const User = require('../model/User_model');
 const Address = require('../model/Address_model');
 const fs = require('fs').promises;
+const path = require('path');
 
 
 router.get('/getExcel', async (req, res) => {
@@ -45,12 +46,12 @@ router.get('/userGetExcel/:id', async (req, res) => {
     const worksheet = workbook.addWorksheet('Sheet1',{
       headerFooter:{firstHeader: "Hello Exceljs", firstFooter: "Hello World"}
     });
-    // worksheet.columns = [
-    //   { header: 'Name', key: 'name' },
-    //   { header: 'Age', key: 'age' },
-    //   { header: 'gender', key: 'gender' },
-    //   { header: 'address', key: 'address'}
-    // ]
+    worksheet.columns = [
+      { header: 'Name'},
+      { header: 'Age' },
+      { header: 'gender'},
+      { header: 'address'}
+    ]
     address.forEach(element => {
       const rowValues = []
       // worksheet.addTable({
@@ -86,7 +87,8 @@ router.get('/userGetExcel/:id', async (req, res) => {
       // });
       
     });
-    workbook.xlsx.writeFile('data'+ Date.now() +'.xlsx')
+    const dir = path.join(__dirname , "../public/export/")
+    workbook.xlsx.writeFile(dir + 'data'+ Date.now() +'.xlsx')
         .then(() => {   // file is written
             console.log('success')
             res.send('success');
