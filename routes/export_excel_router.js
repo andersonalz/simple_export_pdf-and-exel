@@ -52,28 +52,10 @@ router.get('/userGetExcel/:id', async (req, res) => {
       { header: 'gender'},
       { header: 'address'}
     ]
-    address.forEach(element => {
+    address.forEach(element , index => {
       const rowValues = []
-      // worksheet.addTable({
-      //   name: 'MyTable',
-      //   ref: 'A1',
-      //   headerRow: true,
-      //   totalsRow: true,
-      //   style: {
-      //     theme: 'TableStyleDark3',
-      //     showRowStripes: true,
-      //   },
-      //   columns: [
-      //       { header: 'Name', key: 'name' },
-      //       { header: 'Age', key: 'age' },
-      //       { header: 'gender', key: 'gender' },
-      //       { header: 'address', key: 'address'}
-      //     ],
-      //   rows: [
-      //     [element.uaerAddress.name]
-      //   ],
-      // });
         // rowValues.push(element.userAddress.name,element.userAddress.age,element.userAddress.gender,element.address)
+        if(rowValues[0])
         rowValues[0] = element.userAddress.name
         rowValues[1] = element.userAddress.age
         rowValues[2] = element.userAddress.gender
@@ -99,17 +81,9 @@ router.get('/userGetExcel/:id', async (req, res) => {
 });
 // router.get('/readFile', async (req, res) => {
 //     try {
-    //   const readFileFs  = await fs.readFile(__dirname + one.xlsx);
     //   const workbook = new Excel.Workbook();
-    //   const readFile = await workbook.xlsx.readFile(__dirname + one.xlsx)
-
-    //   console.log(readFileFs)
-    //   fs.readFile(readFile, function (err, data) {    // file is read 
-    //         if (err) { console.log(err); }
-    //         res.send(data);
-    //         console.log(data);
-    //     });
-    //     console.log(readFile);
+    // const dir = path.join(__dirname , "../public/export/")
+    //   const readFile = await workbook.xlsx.readFile(dir + one.xlsx)
     //     res.send("ok");
     //   } catch (err) { 
     //       res.send(err);
