@@ -19,14 +19,14 @@ router.get('/getExcel', async (req, res) => {
       { header: 'address', key: 'address'}
     ]
     address.forEach(element => {
-      worksheet.addRow(element);
+      worksheet.addRow(element.userAddress);
       console.log(element);
-      user.forEach(element => {
-        worksheet.addRow(element);
-        console.log(element);
-      });
+      // user.forEach(element => {
+      //   worksheet.addRow(element);
+      //   console.log(element);
+      // });
     });
-    workbook.xlsx.writeFile('data.xlsx')
+    workbook.xlsx.writeFile('data'+ Date.now() +'.xlsx')
         .then(() => {   // file is written
             console.log('success')
             res.send('success');
@@ -36,6 +36,65 @@ router.get('/getExcel', async (req, res) => {
     }
 });
 
+
+router.get('/userGetExcel/:id', async (req, res) => {
+  try {
+    const user = await User.find({});
+    const address = await Address.find({ userAddress : req.params.id }).populate('userAddress').limit(3);
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Sheet1',{
+      headerFooter:{firstHeader: "Hello Exceljs", firstFooter: "Hello World"}
+    });
+    // worksheet.columns = [
+    //   { header: 'Name', key: 'name' },
+    //   { header: 'Age', key: 'age' },
+    //   { header: 'gender', key: 'gender' },
+    //   { header: 'address', key: 'address'}
+    // ]
+    address.forEach(element => {
+      const rowValues = []
+      // worksheet.addTable({
+      //   name: 'MyTable',
+      //   ref: 'A1',
+      //   headerRow: true,
+      //   totalsRow: true,
+      //   style: {
+      //     theme: 'TableStyleDark3',
+      //     showRowStripes: true,
+      //   },
+      //   columns: [
+      //       { header: 'Name', key: 'name' },
+      //       { header: 'Age', key: 'age' },
+      //       { header: 'gender', key: 'gender' },
+      //       { header: 'address', key: 'address'}
+      //     ],
+      //   rows: [
+      //     [element.uaerAddress.name]
+      //   ],
+      // });
+        // rowValues.push(element.userAddress.name,element.userAddress.age,element.userAddress.gender,element.address)
+        rowValues[0] = element.userAddress.name
+        rowValues[1] = element.userAddress.age
+        rowValues[2] = element.userAddress.gender
+        rowValues[3] = element.address
+        worksheet.addRow(rowValues);
+      // worksheet.addRow(element.userAddress);
+      // console.log(element);
+      // user.forEach(element => {
+      //   worksheet.addRow(element);
+      //   console.log(element);
+      // });
+      
+    });
+    workbook.xlsx.writeFile('data'+ Date.now() +'.xlsx')
+        .then(() => {   // file is written
+            console.log('success')
+            res.send('success');
+        });
+    } catch (err) {
+        res.send(err);
+    }
+});
 // router.get('/readFile', async (req, res) => {
 //     try {
     //   const readFileFs  = await fs.readFile(__dirname + one.xlsx);

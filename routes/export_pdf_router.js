@@ -75,7 +75,7 @@ router.get('/getPdf', async (req, res) => {
 
 
 
-router.get('/getPdfOneUser:id', async (req, res) => {
+router.get('/userGetPdf/:id', async (req, res) => {
 
     try {
         var fonts = {
@@ -86,7 +86,9 @@ router.get('/getPdfOneUser:id', async (req, res) => {
                 bolditalics: path.join(__dirname, '..', 'public', '/fonts/Roboto-MediumItalic.ttf')
             }
         };
-        const address = await Address.find({userAddress : req.params.id}).populate('userAddress').exec();
+        const address = await Address.find({userAddress : req.params.id}).populate({
+            path: 'userAddress',
+            options: { limit: 3 }})
         let a = [[{
             text: 'Name',
             
