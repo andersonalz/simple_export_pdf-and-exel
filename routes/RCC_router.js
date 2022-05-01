@@ -8,9 +8,7 @@ const router = express.Router()
 router.post("/createReign", async (req, res) => {
     try {
         const Create_Reign = await Reign.create({
-            reignName: req.body.reignName,
-            cityReign : req.body.cityReign,
-            countryReign : req.body.countryReign,
+            reignName: req.body.reignName
         })
         res.send(Create_Reign);
     }
@@ -49,30 +47,53 @@ router.post("/createCity", async (req, res) => {
 
 
 router.get("/getReignFromCity/:name" , async (req , res)=>{
+    const oneCity = await Reign.aggregate([
+        { $match: { reignName: req.params.name } },
+        {
+            $lookup: {
+                from: Country.collection.name,
+                localField: "_id",
+                foreignField: "reignOfCountries",
+                as: "countries",
+                pipeline: [
+                    {
+                        $lookup: {
+                            from: City.collection.name,
+                            localField: "_id",
+                            foreignField: "countryOfCities",
+                            as: "cities"
+                        }
+                    }
+                ]
+            },
+        },
+    ]).exec();
     // const oneCity = await City.find({cityName : req.params.name}).populate( "countryOfCities")
     // const onecountry =  await Country.find({countryName :oneCity[0].countryOfCities.countryName }).populate("reignOfCountries")
     // console.log(onecountry);
     // res.send("ok");
 
-    const oneCity = await City.aggregate([
-        { "$match": { "cityName": req.params.name } },
-        { "$lookup": { "from": "country", "localField": "countryOfCities", "foreignField": "_id", "as": "countryOfCities" } },
-        { "$unwind": "$countryOfCities" },
-        { "$lookup": { "from": "reign", "localField": "countryOfCities.reignOfCountries", "foreignField": "_id", "as": "reignOfCountries" } },
-        { "$unwind": "$reignOfCountries" },
-        { "$project": { "reignOfCountries.reignName": 1 } }
-    ]).exec()
+    // const oneCity = await City.aggregate([
+    //     { "$match": { "cityName": req.params.name } },
+    //     { "$lookup": {
+    //         "from": "reignOfCountries",
+    //         "let": { "reignOfCountriesId": "$reignOfCountries" },
+    //           "as": "potentialLevels",
+    //           "pipeline": [
+    //             { "$match": { "$expr": { "$eq": [ "$_id", "$$reignOfCountriesId" ] } } },
+    //             { "$project": { "description": 1, "result": 1, "plIndex": 1 }}
+    //           ],
+    //         }}
+    // ])
+    // aggregate([
+    //     { "$match": { "cityName": req.params.name } },
+    //     { "$lookup": { "from": "country", "localField": "countryOfCities", "foreignField": "_id", "as": "countryOfCities" } },
+    //     { "$unwind": "$countryOfCities" },
+    //     { "$lookup": { "from": "reign", "localField": "countryOfCities.reignOfCountries", "foreignField": "_id", "as": "reignOfCountries" } },
+    //     { "$unwind": "$reignOfCountries" },
+    //     { "$project": { "reignOfCountries.reignName": 1 } }
+    // ]).exec()
     console.log(oneCity);
     res.send(oneCity);
-
-        // { "$lookup": {
-        //   "from": PotentialLevels.collection.name,
-        //   "let": { "potentialLevels": "$potentialLevels" },
-        //   "pipeline": [
-        //     { "$match": { "$expr": { "$in": [ "$_id", "$$potentialLevels" ] } } },
-        //     { "$project": { "description": 1, "result": 1, "plIndex": 1 }}
-        //   ],
-        //   "as": "potentialLevels"
-        // }},
 })
 module.exports = router
