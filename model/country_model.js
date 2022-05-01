@@ -9,7 +9,7 @@ const CountrySchema = new mongoose.Schema({
         required : true,
         trim : true,        
     },
-    reignCountry:
+    reignOfCountries:
     {
         type : Schema.Types.ObjectId,
         ref : 'reign',

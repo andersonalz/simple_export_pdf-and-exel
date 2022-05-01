@@ -6,8 +6,7 @@ const ReignSchema = new mongoose.Schema({
 
     reignName : {
         type : String,
-        required : true,
-        trim : true,        
+        required : true,       
     }
 })  
 
