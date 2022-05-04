@@ -72,28 +72,60 @@ router.get("/getReignFromCity/:name" , async (req , res)=>{
     // const onecountry =  await Country.find({countryName :oneCity[0].countryOfCities.countryName }).populate("reignOfCountries")
     // console.log(onecountry);
     // res.send("ok");
-
-    // const oneCity = await City.aggregate([
-    //     { "$match": { "cityName": req.params.name } },
-    //     { "$lookup": {
-    //         "from": "reignOfCountries",
-    //         "let": { "reignOfCountriesId": "$reignOfCountries" },
-    //           "as": "potentialLevels",
-    //           "pipeline": [
-    //             { "$match": { "$expr": { "$eq": [ "$_id", "$$reignOfCountriesId" ] } } },
-    //             { "$project": { "description": 1, "result": 1, "plIndex": 1 }}
-    //           ],
-    //         }}
-    // ])
-    // aggregate([
-    //     { "$match": { "cityName": req.params.name } },
-    //     { "$lookup": { "from": "country", "localField": "countryOfCities", "foreignField": "_id", "as": "countryOfCities" } },
-    //     { "$unwind": "$countryOfCities" },
-    //     { "$lookup": { "from": "reign", "localField": "countryOfCities.reignOfCountries", "foreignField": "_id", "as": "reignOfCountries" } },
-    //     { "$unwind": "$reignOfCountries" },
-    //     { "$project": { "reignOfCountries.reignName": 1 } }
-    // ]).exec()
     console.log(oneCity);
     res.send(oneCity);
 })
+
+
+
+router.get("/allCityCountry/:name" , async (req , res)=>{
+    const allCityCountry = await Country.aggregate([
+        {
+            $match: { countryName: req.params.name }
+        },
+        { 
+            $lookup: {
+                from: City.collection.name,
+                localField: "_id",
+                foreignField: "countryOfCities",
+                as: "cities"
+        }
+    },
+    { $unwind: "$cities" },
+    {
+        $project: {
+          "_id": 0,
+          "reignOfCountries": 0,
+          "countryOfCities": 0,
+          "__v": 0,
+          "cityName": "$cities.cityName",
+      }
+    }
+    ]).exec();
+    console.log(allCityCountry);
+    res.send(allCityCountry);
+}) 
+ 
+
+router.get("/getAllCityFromCountry/:name" , async (req , res)=>{
+    const oneCity = await City.find({cityName : req.params.name}).populate( "countryOfCities")
+    const oneCountry =  await Country.find({countryName :oneCity[0].countryOfCities.countryName }).populate("reignOfCountries")
+    console.log(oneCity);
+    res.send(oneCity);
+})
+router.get('/countCity' , async (req , res)=>{
+    const count = await City.aggregate([
+        {
+            $group: {
+                _id: "A",
+                count: { $sum: 1 }
+            }
+        }
+    ]).exec()
+    console.log(count);
+    res.send("ok");
+})
+
+
 module.exports = router
+
